@@ -38,4 +38,53 @@ public class Procedure extends Block{
     public String getProcedureName(){
         return procedureName;
     }
+
+    //Function responsible for adding a new expression to the procedure,
+    //that will later resolve to the int value passed as a procedure argument
+    public void addParamValue(Expressions expression){
+        paramExpressions.add(expression);
+    }
+
+    @Override
+    public void execute(List<Instructions> scopeStack) {
+        for(int i = 0; i < paramNames.size(); ++i) {
+            variableCopying.put(paramNames.get(i), paramExpressions.get(i).value(scopeStack));
+        }
+        variables = variableCopying;
+        scopeStack.add(this);
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        appendTabs(sb);
+        sb.append("begin " + procedureName + "(");
+        for(int i = 0; i < paramNames.size(); ++i){
+            sb.append(paramNames.get(i));
+            if(i != paramNames.size() - 1){
+                sb.append(", ");
+            }
+        }
+        sb.append(")\n");
+        for(Instructions ins : instructions){
+            for(int i = 0; i <= numberOfTabs; ++i) {
+                ins.incrementNumberOfTabs();
+            }
+            sb.append(ins.toString());
+            for(int i = 0; i <= numberOfTabs; ++i) {
+                ins.decrementNumberOfTabs();
+            }
+        }
+        appendTabs(sb);
+        sb.append("end " + procedureName + "(");
+        for(int i = 0; i < paramNames.size(); ++i){
+            sb.append(paramNames.get(i));
+            if(i != paramNames.size() - 1){
+                sb.append(", ");
+            }
+        }
+        sb.append(")\n");
+
+        return sb.toString();
+    }
 }
