@@ -1,5 +1,9 @@
 package instructions;
 
+import exceptions.InvalidNumberOfProcedureParametersException;
+import exceptions.NonExistingProcedureException;
+import expressions.Expressions;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +14,44 @@ public class Block extends Instructions {
     //variable declarations to the constructor, so we won't be able to
     //add new variables after the end of the declaration series
 
+    //Arrays below are used to prevent shallow copy on the constructor's args
     Map<Character, Integer> variableCopying;
-    public Block(Map<Character, Integer> variables){
+    //Child classes won't be operating on procedures, because one of them is a procedure
+    private Map<String, Procedure> procedureCopying;
+    public Block(Map<Character, Integer> variables, Map<String, Procedure> procedures){
         this.variables = variables;
         variableCopying = new HashMap<>();
-        //preventing shallow copy
-        for(Character c : variables.keySet()){
-            variableCopying.put(c, variables.get(c));
+        //preventing shallow copy on variables
+        if(variables != null) {
+            for (Character c : variables.keySet()) {
+                variableCopying.put(c, variables.get(c));
+            }
         }
+
+        procedureCopying = new HashMap<>();
+        //preventing shallow copy on procedures
+        if(procedures != null) {
+            for (String s : procedures.keySet()) {
+                procedureCopying.put(s, procedures.get(s));
+            }
+        }
+    }
+
+    public void callProcedure(String name, Expressions... params){
+        Procedure p;
+        if(procedureCopying.get(name) == null){
+            throw new NonExistingProcedureException();
+        }
+        else{
+            p = new Procedure(procedureCopying.get(name));
+            if(p.getParamNames().size() != params.length){
+                throw new InvalidNumberOfProcedureParametersException();
+            }
+            for(Expressions e : params){
+                p.addParamValue(e);
+            }
+        }
+        addInstruction(p, true);
     }
 
     protected Block(){
