@@ -1,5 +1,7 @@
 package instructions;
 
+import exceptions.InvalidNumberOfProcedureParametersException;
+import exceptions.NonExistingProcedureException;
 import expressions.Expressions;
 
 import java.util.ArrayList;
