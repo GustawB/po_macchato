@@ -15,11 +15,12 @@ public class Block extends Instructions {
     //add new variables after the end of the declaration series
 
     //Arrays below are used to prevent shallow copy on the constructor's args
-    Map<Character, Integer> variableCopying;
+    protected Map<Character, Integer> variableCopying;
     //Child classes won't be operating on procedures, because one of them is a procedure
     private Map<String, Procedure> procedureCopying;
     public Block(Map<Character, Integer> variables, Map<String, Procedure> procedures){
         this.variables = variables;
+        this.procedures = procedures;
         variableCopying = new HashMap<>();
         //preventing shallow copy on variables
         if(variables != null) {
@@ -57,6 +58,8 @@ public class Block extends Instructions {
     protected Block(){
         variables = new HashMap<>();
         variableCopying = new HashMap<>();
+        procedures = new HashMap<>();
+        procedureCopying = new HashMap<>();
     }
 
     @Override
@@ -64,6 +67,9 @@ public class Block extends Instructions {
         scopeStack.remove(this);
         for(Character c : variableCopying.keySet()){
             variables.put(c, variableCopying.get(c));
+        }
+        for(String s : procedureCopying.keySet()){
+            procedures.put(s, procedureCopying.get(s));
         }
     }
 
