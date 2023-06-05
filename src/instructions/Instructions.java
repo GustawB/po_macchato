@@ -10,10 +10,12 @@ public abstract class Instructions {
     protected List<Instructions> instructions;
     //list if the variables for instructions that need it
     protected Map<Character, Integer> variables;
+    protected Map<String, Procedure> procedures;
 
     protected Instructions(){
         variables = new HashMap<>();
         instructions = new ArrayList<>();
+        procedures = new HashMap<>();
     }
     //variable used for printing the correct number of tabs when printing
     //the next instruction with its nested instructions
@@ -31,6 +33,9 @@ public abstract class Instructions {
     public Map<Character, Integer> getVariables() {
         return variables;
     }
+
+    //returns the map containing procedures belonging to the instruction
+    public Map<String, Procedure> getProcedures(){return procedures;}
 
     //function used for printing tabs when the debugger
     //prints nested instructions

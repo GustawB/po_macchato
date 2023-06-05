@@ -3,7 +3,14 @@ package runtime;
 import exceptions.NonExistingVariableException;
 import instructions.Block;
 import instructions.Instructions;
+import instructions.PrintExpr;
+import instructions.Procedure;
 
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +53,7 @@ public class Debugger {
         //debugMode to c(ontinue), which is equivalent to run without debug
         if(mode == 'n'){return new String[]{"c"};}
         else {
-            System.out.println("Input next debug command: c/s/d/e");
+            System.out.println("Input next debug command: c/s/m/d/e");
             Scanner in = new Scanner(System.in);
             String debugCommand = in.nextLine();
             String[] array = debugCommand.split("[ ]+");
@@ -101,9 +108,52 @@ public class Debugger {
                 Instructions instructions = scopeStack.get(i);
                 for(Map.Entry<Character, Integer> m :
                         instructions.getVariables().entrySet()){
-                    System.out.print(m.getKey() + ": " + m.getValue() + "; ");}System.out.println("");
+                    System.out.print(m.getKey() + ": " + m.getValue() + "; ");
+                }
+                System.out.println("");
             }
             System.out.println("");
+        }
+    }
+
+    protected void dump(String filePath){
+        Path file = null;
+        try {
+            file = Paths.get(filePath);
+        }
+        catch(Exception e){
+            System.out.println("Failed to find the specified path.");
+        }
+        List<String> textToWrite = new ArrayList<>();
+        if(scopeStack.size() > 0) {
+            for (int i = scopeStack.size() - 1;
+                 i >= scopeStack.size() - 1; --i) {
+                Instructions instructions = scopeStack.get(i);
+                for (Map.Entry<Character, Integer> m :
+                        instructions.getVariables().entrySet()) {
+                    textToWrite.add(m.getKey() + ": " + m.getValue() + "; ");
+                }
+                for(Map.Entry<String, Procedure> m :
+                        instructions.getProcedures().entrySet()){
+                    String line = m.getKey() + "(";
+                    Procedure p = m.getValue();
+                    for(int y = 0; y < p.getParamNames().size(); ++y){
+                        List<Character> params = p.getParamNames();
+                        line += p.getParamNames().get(y);
+                        if(y != p.getParamNames().size() - 1){
+                            line += ", ";
+                        }
+                    }
+                    line += ");";
+                    textToWrite.add(line);
+                }
+            }
+        }
+        try{
+            Files.write(file, textToWrite, StandardCharsets.UTF_8);
+        }
+        catch (Exception e){
+            System.out.println("Failed to write to the specified file.");
         }
     }
 
@@ -113,7 +163,7 @@ public class Debugger {
     protected void iterateThroughInstructions(List<Instructions> instructions){
         for(Instructions ins : instructions) {
             do {
-                //if we haven't set debigMode yet OR we stopped stepping
+                //if we haven't set debugMode yet OR we stopped stepping
                 if ((debugMode.equals("s") && stepsIter == numberOfSteps) ||
                         debugMode.isEmpty()) {
                     do {
@@ -154,10 +204,24 @@ public class Debugger {
                                 display(numberOfLevels);
                             }
                         }
+                        else if(debugMode.equals("m")){
+                            String filePath = "";
+                            boolean bIsValidCommand = true;
+                            try {
+                                filePath = command[1];
+                            }
+                            catch (Exception e){
+                                bIsValidCommand = false;
+                            }
+                            if(bIsValidCommand) {
+                                dump(filePath);
+                            }
+                        }
                         else{
                             //basic input checking
                             while(!debugMode.equals("c") &&
                                     !debugMode.equals("s") &&
+                                    !debugMode.equals("m") &&
                                     !debugMode.equals("d") &&
                                     !debugMode.equals("e")) {
                                 command = readDebugCommand();
@@ -166,7 +230,7 @@ public class Debugger {
                             }
                         }
                     } while ((debugMode.equals("s") && numberOfSteps == 0) ||
-                            debugMode.equals("d"));
+                            debugMode.equals("d") || debugMode.equals("m"));
                 }
                 //if debugger didn't step enough instructions OR
                 //the user wants to continue (continuing is equivalent to
