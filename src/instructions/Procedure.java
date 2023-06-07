@@ -1,9 +1,12 @@
 package instructions;
 
 import expressions.Expressions;
+import expressions.Literal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Procedure extends Block{
     private String procedureName;
@@ -11,16 +14,13 @@ public class Procedure extends Block{
     private List<Expressions> paramExpressions;
     //Constructor used for creating a new procedure object so that
     //a new procedure can be declared
-    public Procedure(String procedureName, List<Character> paramNames){
-        super();
-        this.procedureName = procedureName;
-        this.paramNames = new ArrayList<>();
-        paramExpressions = new ArrayList<>();
-        if(paramNames != null){
-            for(Character c : paramNames){
-                this.paramNames.add(c);
-            }
-        }
+
+    public Procedure(Builder pr){
+        super(); //for my visibility
+        this.procedureName = pr.name;
+        paramNames = new ArrayList<>();
+        paramNames.addAll(pr.variableNames);
+        this.variables.putAll(pr.variables);
     }
 
     //Constructor used for using the same function declaration multiple times
@@ -86,5 +86,46 @@ public class Procedure extends Block{
         sb.append(")\n");
 
         return sb.toString();
+    }
+
+    public static class Builder {
+        private final List<Instructions> instructions = new ArrayList<>();
+        private final Map<Character, Integer> variables = new HashMap<>();
+        private final List<Character> variableNames = new ArrayList<>();
+        private String name;
+
+        public Builder (String name){
+            this.name = name;
+        }
+
+        public Builder addVariable(char name){
+            variableNames.add(name);
+            return this;
+        }
+
+        public Builder assign(char assignTo, Expressions valueToAssign){
+            instructions.add(new AssignValue(assignTo, valueToAssign));
+            return this;
+        }
+
+        public Builder declareVariable(char name, Literal value){
+            variables.put(name, value.value());
+            return this;
+        }
+
+        public Builder print(Expressions valueToPrint){
+            instructions.add(new PrintExpr(valueToPrint));
+            return this;
+        }
+
+        public Builder newLoop(ForLoop loop){
+            instructions.add(loop);
+            return this;
+        }
+
+        public Builder condition(IfStatement condition){
+            instructions.add(condition);
+            return this;
+        }
     }
 }
