@@ -7,7 +7,7 @@ import java.util.List;
 public class Modulo extends Expressions {
     Expressions left;
     Expressions right;
-    public Modulo(Expressions left, Expressions right){
+    private Modulo(Expressions left, Expressions right){
         this.left = left;
         this.right = right;
     }
@@ -20,5 +20,9 @@ public class Modulo extends Expressions {
     @Override
     public String toString(){
         return (left.toString() + " % " + right.toString());
+    }
+
+    public static Modulo of(Expressions left, Expressions right){
+        return new Modulo(left, right);
     }
 }

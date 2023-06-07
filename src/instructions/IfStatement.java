@@ -17,13 +17,14 @@ public class IfStatement extends Instructions {
     protected List<Instructions> ifInstructions;
     protected List<Instructions> elseInstructions;
 
-    public IfStatement(Expressions expr1, Expressions expr2, Operations op) {
-        super();
-        elseInstructions = new ArrayList<>();
+    private IfStatement(Builder cb){
         ifInstructions = new ArrayList<>();
-        left = expr1;
-        right = expr2;
-        operation = op;
+        elseInstructions = new ArrayList<>();
+        ifInstructions.addAll(cb.ifInstructions);
+        elseInstructions.addAll(cb.elseInstructions);
+        left = cb.expression;
+        right = cb.compareWith;
+        operation = cb.operator;
     }
 
     @Override
@@ -121,5 +122,76 @@ public class IfStatement extends Instructions {
         }
 
         return sb.toString();
+    }
+
+    public static class Builder {
+        private List<Instructions> ifInstructions = new ArrayList<>();
+        private List<Instructions> elseInstructions = new ArrayList<>();
+        private Operations operator;
+        private Expressions expression;
+        private Expressions compareWith;
+        private boolean addToIfInstructions = true;
+
+        public Builder(Expressions expression, Expressions compareWith, Operations compareBy){
+            this.expression = expression;
+            this.compareWith = compareWith;
+            operator = compareBy;
+        }
+
+        public Builder switchToElseBranch(){
+            addToIfInstructions = false;
+            return  this;
+        }
+
+        public Builder switchToIfBranch(){
+            addToIfInstructions = true;
+            return this;
+        }
+
+        public Builder assign(char assignTo, Expressions valueToAssign){
+            if(addToIfInstructions) {
+                ifInstructions.add(new AssignValue(assignTo, valueToAssign));
+            }
+            else{
+                elseInstructions.add(new AssignValue(assignTo, valueToAssign));
+            }
+
+            return this;
+        }
+
+        public Builder print(Expressions valueToPrint){
+            if(addToIfInstructions) {
+                ifInstructions.add(new PrintExpr(valueToPrint));
+            }
+            else {
+                elseInstructions.add(new PrintExpr(valueToPrint));
+            }
+
+            return this;
+        }
+
+        public Builder condition(IfStatement condition){
+            if(addToIfInstructions){
+                ifInstructions.add(condition);
+            }
+            else{
+                elseInstructions.add(condition);
+            }
+
+            return this;
+        }
+
+        public Builder newLoop(ForLoop loop){
+            if(addToIfInstructions){
+                ifInstructions.add(loop);
+            }
+            else{
+                elseInstructions.add(loop);
+            }
+
+            return this;
+        }
+
+        public IfStatement build(){return new IfStatement(this);}
     }
 }

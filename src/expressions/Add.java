@@ -7,7 +7,7 @@ import java.util.List;
 public class Add extends Expressions {
     Expressions left;
     Expressions right;
-    public Add(Expressions left, Expressions right){
+    private Add(Expressions left, Expressions right){
         this.left = left;
         this.right = right;
     }
@@ -20,5 +20,9 @@ public class Add extends Expressions {
     @Override
     public String toString(){
         return (left.toString() + " + " + right.toString());
+    }
+
+    public static Add of(Expressions left, Expressions right){
+        return new Add(left, right);
     }
 }

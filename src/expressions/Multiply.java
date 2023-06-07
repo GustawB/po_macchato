@@ -7,7 +7,7 @@ import java.util.List;
 public class Multiply extends Expressions {
     Expressions left;
     Expressions right;
-    public Multiply(Expressions left, Expressions right){
+    private Multiply(Expressions left, Expressions right){
         this.left = left;
         this.right = right;
     }
@@ -20,5 +20,9 @@ public class Multiply extends Expressions {
     @Override
     public String toString(){
         return (left.toString() + " * " + right.toString());
+    }
+
+    public static Multiply of(Expressions left, Expressions right){
+        return new Multiply(left, right);
     }
 }

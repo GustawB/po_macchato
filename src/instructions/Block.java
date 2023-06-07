@@ -3,6 +3,7 @@ package instructions;
 import exceptions.InvalidNumberOfProcedureParametersException;
 import exceptions.NonExistingProcedureException;
 import expressions.Expressions;
+import expressions.Literal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,27 +19,23 @@ public class Block extends Instructions {
     protected Map<Character, Integer> variableCopying;
     //Child classes won't be operating on procedures, because one of them is a procedure
     private Map<String, Procedure> procedureCopying;
-    public Block(Map<Character, Integer> variables, Map<String, Procedure> procedures){
-        this.variables = variables;
-        this.procedures = procedures;
-        variableCopying = new HashMap<>();
-        //preventing shallow copy on variables
-        if(variables != null) {
-            for (Character c : variables.keySet()) {
-                variableCopying.put(c, variables.get(c));
-            }
-        }
 
+    private Block(Builder bb){
+        this.variables = bb.variables;
+        this.procedures = bb.procedures;
+        variableCopying = new HashMap<>();
         procedureCopying = new HashMap<>();
-        //preventing shallow copy on procedures
-        if(procedures != null) {
-            for (String s : procedures.keySet()) {
-                procedureCopying.put(s, procedures.get(s));
-            }
+        //preventing shallow copy on variables
+        for (Character c : bb.variables.keySet()) {
+            variableCopying.put(c, bb.variables.get(c));
         }
+        for (String s : bb.procedures.keySet()) {
+            procedureCopying.put(s, bb.procedures.get(s));
+        }
+        this.instructions.addAll(bb.instructions);
     }
 
-    public void callProcedure(String name, Expressions... params){
+    public Instructions callProcedure(String name, Expressions... params){
         Procedure p;
         if(procedureCopying.get(name) == null){
             throw new NonExistingProcedureException();
@@ -52,7 +49,7 @@ public class Block extends Instructions {
                 p.addParamValue(e);
             }
         }
-        addInstruction(p, true);
+        return p;
     }
 
     protected Block(){
@@ -97,4 +94,51 @@ public class Block extends Instructions {
 
         return sb.toString();
     }
+
+
+    public static class Builder {
+        private final Map<Character, Integer> variables = new HashMap<>();
+        private final Map<String, Procedure> procedures  = new HashMap<>();
+        private final List<Instructions> instructions = new ArrayList<>();
+
+        public Builder declareVariable(char name, Literal value){
+            variables.put(name, value.value());
+            return this;
+        }
+        public Builder declareProcedure(Procedure procedure){
+            procedures.put(procedure.getProcedureName(), procedure);
+            return this;
+        }
+        public Builder newBlock(Block newBlock){
+            instructions.add(newBlock);
+            return this;
+        }
+
+        public Builder assign(char assignTo, Expressions valueToAssign){
+            instructions.add(new AssignValue(assignTo, valueToAssign));
+            return this;
+        }
+
+        public Builder print(Expressions valueToPrint){
+            instructions.add(new PrintExpr(valueToPrint));
+            return this;
+        }
+
+        public Builder newLoop(ForLoop loop){
+            instructions.add(loop);
+            return this;
+        }
+
+        public Builder condition(IfStatement condition){
+            instructions.add(condition);
+            return this;
+        }
+
+        public Block build(){
+            return new Block(this);
+        }
+
+    }
 }
+
+

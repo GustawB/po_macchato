@@ -7,7 +7,7 @@ import java.util.List;
 public class Substract extends Expressions {
     Expressions left;
     Expressions right;
-    public Substract(Expressions left, Expressions right){
+    private Substract(Expressions left, Expressions right){
         this.left = left;
         this.right = right;
     }
@@ -27,5 +27,9 @@ public class Substract extends Expressions {
     @Override
     public String toString(){
         return (left.toString() + " - " + right.toString());
+    }
+
+    public static Substract of(Expressions left, Expressions right){
+        return new Substract(left, right);
     }
 }
