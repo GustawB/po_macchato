@@ -15,6 +15,8 @@ public class Literal extends Expressions {
         return value;
     }
 
+    public int value(){return value;}
+
     @Override
     public String toString() {
         return value + "";
