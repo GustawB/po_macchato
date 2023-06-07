@@ -274,4 +274,14 @@ public class Debugger {
             System.out.println("The program has ended");
         }
     }
+
+    //run() overload used in tests to omit unnecessary prints
+    public void run (Block Program, char runMode) {
+        mode = runMode;
+        numberOfSteps = 0;
+        stepsIter = 0;
+        List<Instructions> instructions = new ArrayList<>();
+        instructions.add(Program);
+        iterateThroughInstructions(instructions);
+    }
 }
