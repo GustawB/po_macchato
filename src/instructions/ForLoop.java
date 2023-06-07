@@ -18,9 +18,11 @@ public class ForLoop extends Block{
     private boolean isStarted;
     private boolean bAreThereAnyIterationsToPerform = true;
 
-    public ForLoop(char name, Expressions expression){
-        iterExpr = expression;
-        iteratorName = name;
+    private ForLoop(Builder lb){
+        super(); //for my visibility
+        this.iteratorName = lb.iteratorName;
+        this.iterExpr = lb.limit;
+        this.instructions.addAll(lb.instructions);
         isStarted = false;
     }
 
@@ -90,5 +92,39 @@ public class ForLoop extends Block{
         }
 
         return sb.toString();
+    }
+
+    public static class Builder {
+        private char iteratorName;
+        private Expressions limit;
+
+        private final List<Instructions> instructions = new ArrayList<>();
+
+        public Builder(char iteratorName, Expressions limit) {
+            this.iteratorName = iteratorName;
+            this.limit = limit;
+        }
+
+        public Builder assign(char assignTo, Expressions valueToAssign) {
+            instructions.add(new AssignValue(assignTo, valueToAssign));
+            return this;
+        }
+
+        public Builder print(Expressions valueToPrint) {
+            instructions.add(new PrintExpr(valueToPrint));
+            return this;
+        }
+
+        public Builder newLoop(ForLoop loop) {
+            instructions.add(loop);
+            return this;
+        }
+
+        public Builder condition(IfStatement condition) {
+            instructions.add(condition);
+            return this;
+        }
+
+        public ForLoop build(){return new ForLoop(this);}
     }
 }
