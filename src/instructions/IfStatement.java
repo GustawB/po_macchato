@@ -124,7 +124,7 @@ public class IfStatement extends Instructions {
         return sb.toString();
     }
 
-    public class Builder {
+    public static class Builder {
         private List<Instructions> ifInstructions = new ArrayList<>();
         private List<Instructions> elseInstructions = new ArrayList<>();
         private Operations operator;

@@ -56,7 +56,7 @@ public class ForLoop extends Block{
             iterValue = 0;
             //trying to calculate the value of the expression
             try {
-                iterValueStateAtTheEnd = iterExpr.value(scopeStack) - 1;
+                iterValueStateAtTheEnd = iterExpr.value(scopeStack);
             }
             catch(Exception e){//calculating the value of the expression failed
                 System.out.println("Error in: instructions.ForLoop(" + iteratorName +
