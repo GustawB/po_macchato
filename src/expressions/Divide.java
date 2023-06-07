@@ -7,7 +7,7 @@ import java.util.List;
 public class Divide extends Expressions {
     Expressions left;
     Expressions right;
-    public Divide(Expressions left, Expressions right){
+    private Divide(Expressions left, Expressions right){
         this.left = left;
         this.right = right;
     }
@@ -20,5 +20,9 @@ public class Divide extends Expressions {
     @Override
     public String toString(){
         return (left.toString() + " / " + right.toString());
+    }
+
+    public static Divide of(Expressions left, Expressions right){
+        return new Divide(left, right);
     }
 }

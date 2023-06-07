@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Literal extends Expressions {
     protected int value;
-    public Literal(int value){
+    private Literal(int value){
         this.value = value;
     }
     @Override
@@ -16,6 +16,10 @@ public class Literal extends Expressions {
     }
 
     public int value(){return value;}
+
+    public static Literal of(int value){
+        return new Literal(value);
+    }
 
     @Override
     public String toString() {

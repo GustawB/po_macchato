@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Variable extends Expressions {
     protected char name;
-    public Variable(char name){
+    private Variable(char name){
         this.name = name;
     }
 
@@ -24,5 +24,9 @@ public class Variable extends Expressions {
     @Override
     public String toString() {
         return name + "";
+    }
+
+    public static Variable of(char name){
+        return new Variable(name);
     }
 }
