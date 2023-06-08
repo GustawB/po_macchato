@@ -15,12 +15,17 @@ public class Procedure extends Block{
     //Constructor used for creating a new procedure object so that
     //a new procedure can be declared
 
-    public Procedure(Builder pr){
+    private Procedure(declarationBuilder pr){
         super(); //for my visibility
         this.procedureName = pr.name;
         paramNames = new ArrayList<>();
         paramNames.addAll(pr.variableNames);
-        this.variables.putAll(pr.variables);
+    }
+
+    private Procedure(invokeBuilder ib){
+        super();
+        this.procedureName = ib.name;
+        this.paramExpressions.addAll(ib.parameters);
     }
 
     //Constructor used for using the same function declaration multiple times
@@ -88,44 +93,48 @@ public class Procedure extends Block{
         return sb.toString();
     }
 
-    public static class Builder {
+    public static class declarationBuilder {
         private final List<Instructions> instructions = new ArrayList<>();
-        private final Map<Character, Integer> variables = new HashMap<>();
         private final List<Character> variableNames = new ArrayList<>();
         private String name;
 
-        public Builder (String name){
+        public declarationBuilder (String name, char... variableNames){
             this.name = name;
+            for(char c : variableNames){
+                this.variableNames.add(c);
+            }
         }
 
-        public Builder addVariable(char name){
-            variableNames.add(name);
-            return this;
-        }
-
-        public Builder assign(char assignTo, Expressions valueToAssign){
+        public declarationBuilder assign(char assignTo, Expressions valueToAssign){
             instructions.add(new AssignValue(assignTo, valueToAssign));
             return this;
         }
 
-        public Builder declareVariable(char name, Literal value){
-            variables.put(name, value.value());
-            return this;
-        }
-
-        public Builder print(Expressions valueToPrint){
+        public declarationBuilder print(Expressions valueToPrint){
             instructions.add(new PrintExpr(valueToPrint));
             return this;
         }
 
-        public Builder newLoop(ForLoop loop){
+        public declarationBuilder newLoop(ForLoop loop){
             instructions.add(loop);
             return this;
         }
 
-        public Builder condition(IfStatement condition){
+        public declarationBuilder condition(IfStatement condition){
             instructions.add(condition);
             return this;
+        }
+    }
+
+    public static class invokeBuilder {
+        private final List<Expressions> parameters = new ArrayList<>();
+        private String name;
+
+        public invokeBuilder (String name, Expressions... params){
+            this.name = name;
+            for(Expressions e : params){
+                this.parameters.add(e);
+            }
         }
     }
 }

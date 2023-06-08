@@ -52,11 +52,12 @@ public class Block extends Instructions {
         return p;
     }
 
-    protected Block(){
+    public Block(){
         variables = new HashMap<>();
         variableCopying = new HashMap<>();
         procedures = new HashMap<>();
         procedureCopying = new HashMap<>();
+        instructions = new ArrayList<>();
     }
 
     @Override
