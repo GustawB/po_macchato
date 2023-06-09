@@ -26,6 +26,8 @@ public abstract class Instructions {
     //function responsible for the execution of the instruction
     public abstract void execute(List<Instructions> scopeStack);
 
+    public abstract Instructions clone();
+
     //function called at the end of the instruction execution
     public void end(List<Instructions> scopeStack){}
 

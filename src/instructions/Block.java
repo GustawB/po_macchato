@@ -35,28 +35,36 @@ public class Block extends Instructions {
         this.instructions.addAll(bb.instructions);
     }
 
-    public Instructions callProcedure(String name, Expressions... params){
-        Procedure p;
-        if(procedureCopying.get(name) == null){
-            throw new NonExistingProcedureException();
-        }
-        else{
-            p = new Procedure(procedureCopying.get(name));
-            if(p.getParamNames().size() != params.length){
-                throw new InvalidNumberOfProcedureParametersException();
-            }
-            for(Expressions e : params){
-                p.addParamValue(e);
-            }
-        }
-        return p;
-    }
-
-    protected Block(){
+    public Block(){
         variables = new HashMap<>();
         variableCopying = new HashMap<>();
         procedures = new HashMap<>();
         procedureCopying = new HashMap<>();
+        instructions = new ArrayList<>();
+    }
+
+    private Block(Block toClone){
+        variables = new HashMap<>();
+        variableCopying = new HashMap<>();
+        procedures = new HashMap<>();
+        procedureCopying = new HashMap<>();
+        instructions = new ArrayList<>();
+        for(Instructions ins : toClone.instructions){
+            this.instructions.add(ins.clone());
+        }
+        for(Map.Entry<Character, Integer> m : toClone.variables.entrySet()){
+            this.variableCopying.put(m.getKey(), m.getValue());
+        }
+        this.variables = variableCopying;
+        for(Map.Entry<String, Procedure> m : toClone.procedures.entrySet()){
+            this.procedureCopying.put(m.getKey(), m.getValue());
+        }
+        this.procedures = procedureCopying;
+    }
+
+    @Override
+    public Block clone() {
+        return new Block(this);
     }
 
     @Override
@@ -107,6 +115,11 @@ public class Block extends Instructions {
         }
         public Builder declareProcedure(Procedure procedure){
             procedures.put(procedure.getProcedureName(), procedure);
+            return this;
+        }
+
+        public Builder invoke(Procedure procedure){
+            instructions.add(procedure);
             return this;
         }
         public Builder newBlock(Block newBlock){

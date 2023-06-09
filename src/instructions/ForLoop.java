@@ -4,6 +4,7 @@ import expressions.Expressions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 //instructions.ForLoop extends instructions.Block because it has its own scope,
 //and the block class represents that
@@ -24,6 +25,20 @@ public class ForLoop extends Block{
         this.iterExpr = lb.limit;
         this.instructions.addAll(lb.instructions);
         isStarted = false;
+    }
+
+    private ForLoop(ForLoop toClone){
+        super();
+        iterExpr = toClone.iterExpr;
+        iteratorName = toClone.iteratorName;
+        for(Instructions ins : toClone.instructions){
+            this.instructions.add(ins.clone());
+        }
+        isStarted = false;
+    }
+    @Override
+    public ForLoop clone() {
+        return new ForLoop(this);
     }
 
     @Override

@@ -19,6 +19,17 @@ public class AssignValue extends Instructions {
         this.name = name;
     }
 
+    private AssignValue(AssignValue toClone){
+        super();
+        this.name = toClone.name;
+        this.valueExpr = toClone.valueExpr;
+    }
+
+    @Override
+    public AssignValue clone() {
+        return new AssignValue(this);
+    }
+
     @Override
     public void execute(List<Instructions> scopeStack) {
         try {

@@ -27,6 +27,26 @@ public class IfStatement extends Instructions {
         operation = cb.operator;
     }
 
+    //used for cloning
+    private IfStatement(IfStatement toClone){
+        ifInstructions = new ArrayList<>();
+        elseInstructions = new ArrayList<>();
+        left = toClone.left;
+        right = toClone.right;
+        operation = toClone.operation;
+        for(Instructions ins : toClone.ifInstructions){
+            this.ifInstructions.add(ins.clone());
+        }
+        for(Instructions ins : toClone.elseInstructions){
+            this.elseInstructions.add(ins.clone());
+        }
+    }
+
+    @Override
+    public IfStatement clone(){
+        return new IfStatement(this);
+    }
+
     @Override
     public void addInstruction(Instructions instruction,
                                boolean bIsConditionTrue){
@@ -189,6 +209,16 @@ public class IfStatement extends Instructions {
                 elseInstructions.add(loop);
             }
 
+            return this;
+        }
+
+        public Builder invoke(Procedure procedure){
+            if(addToIfInstructions) {
+                ifInstructions.add(procedure);
+            }
+            else{
+                elseInstructions.add(procedure);
+            }
             return this;
         }
 

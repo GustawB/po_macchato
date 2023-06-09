@@ -10,14 +10,19 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         Block program = new Block.Builder()
-                .declareVariable('x', Literal.of(69))
-                .declareVariable('y', Literal.of(420))
-                .print(Variable.of('x'))
-                .print(Variable.of('y'))
-                .declareVariable('z', Literal.of(2137))
-                .print(Variable.of('z'))
+                .declareProcedure(new Procedure.declarationBuilder("zegz", 'x')
+                        .condition(new IfStatement.Builder(Variable.of('x'), Literal.of(6), Operations.SMALLER_EQUAL)
+                                .print(Variable.of('x'))
+                                .assign('x', Add.of(Variable.of('x'), Literal.of(1)))
+                                .invoke(new Procedure.invokeBuilder("zegz", Variable.of('x'))
+                                        .build())
+                                .build())
+                        .build())
+                .invoke(new Procedure.invokeBuilder("zegz", Literal.of(0))
+                        .build())
                 .build();
+
         Debugger debugger = new Debugger();
-        debugger.run(program);
+        debugger.run(program, 'n');
     }
 }

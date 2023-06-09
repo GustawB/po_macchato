@@ -11,6 +11,15 @@ public class PrintExpr extends Instructions {
         this.expr = expr;
     }
 
+    private PrintExpr(PrintExpr toClone){
+        this.expr = toClone.expr;
+    }
+
+    @Override
+    public Instructions clone() {
+        return new PrintExpr(this);
+    }
+
     @Override
     public void execute(List<Instructions> scopeStack) {
         int value;
