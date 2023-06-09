@@ -15,19 +15,16 @@ public class Block extends Instructions {
     //variable declarations to the constructor, so we won't be able to
     //add new variables after the end of the declaration series
 
-    //Arrays below are used to prevent shallow copy on the constructor's args
-    protected Map<Character, Integer> variableCopying;
     //Child classes won't be operating on procedures, because one of them is a procedure
     private Map<String, Procedure> procedureCopying;
 
     private Block(Builder bb){
         this.variables = bb.variables;
         this.procedures = bb.procedures;
-        variableCopying = new HashMap<>();
         procedureCopying = new HashMap<>();
         //preventing shallow copy on variables
         for (Character c : bb.variables.keySet()) {
-            variableCopying.put(c, bb.variables.get(c));
+            variables.put(c, bb.variables.get(c));
         }
         for (String s : bb.procedures.keySet()) {
             procedureCopying.put(s, bb.procedures.get(s));
@@ -37,7 +34,6 @@ public class Block extends Instructions {
 
     public Block(){
         variables = new HashMap<>();
-        variableCopying = new HashMap<>();
         procedures = new HashMap<>();
         procedureCopying = new HashMap<>();
         instructions = new ArrayList<>();
@@ -45,7 +41,6 @@ public class Block extends Instructions {
 
     private Block(Block toClone){
         variables = new HashMap<>();
-        variableCopying = new HashMap<>();
         procedures = new HashMap<>();
         procedureCopying = new HashMap<>();
         instructions = new ArrayList<>();
@@ -53,9 +48,8 @@ public class Block extends Instructions {
             this.instructions.add(ins.clone());
         }
         for(Map.Entry<Character, Integer> m : toClone.variables.entrySet()){
-            this.variableCopying.put(m.getKey(), m.getValue());
+            this.variables.put(m.getKey(), m.getValue());
         }
-        this.variables = variableCopying;
         for(Map.Entry<String, Procedure> m : toClone.procedures.entrySet()){
             this.procedureCopying.put(m.getKey(), m.getValue());
         }
@@ -70,9 +64,6 @@ public class Block extends Instructions {
     @Override
     public void end(List<Instructions> scopeStack){
         scopeStack.remove(this);
-        for(Character c : variableCopying.keySet()){
-            variables.put(c, variableCopying.get(c));
-        }
         for(String s : procedureCopying.keySet()){
             procedures.put(s, procedureCopying.get(s));
         }
