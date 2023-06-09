@@ -15,45 +15,39 @@ public class Block extends Instructions {
     //variable declarations to the constructor, so we won't be able to
     //add new variables after the end of the declaration series
 
-    //Child classes won't be operating on procedures, because one of them is a procedure
-    private Map<String, Procedure> procedureCopying;
-
+    //Constructor used by builder
     private Block(Builder bb){
         this.variables = bb.variables;
         this.procedures = bb.procedures;
-        procedureCopying = new HashMap<>();
+        //procedureCopying = new HashMap<>();
         //preventing shallow copy on variables
         for (Character c : bb.variables.keySet()) {
             variables.put(c, bb.variables.get(c));
         }
         for (String s : bb.procedures.keySet()) {
-            procedureCopying.put(s, bb.procedures.get(s));
+            procedures.put(s, bb.procedures.get(s));
         }
         this.instructions.addAll(bb.instructions);
     }
 
-    public Block(){
+
+    //Constructor used to quickly initialize variables in child classes
+    protected Block(){
         variables = new HashMap<>();
         procedures = new HashMap<>();
-        procedureCopying = new HashMap<>();
         instructions = new ArrayList<>();
     }
 
+    //Clone constructor
     private Block(Block toClone){
         variables = new HashMap<>();
         procedures = new HashMap<>();
-        procedureCopying = new HashMap<>();
         instructions = new ArrayList<>();
         for(Instructions ins : toClone.instructions){
             this.instructions.add(ins.clone());
         }
-        for(Map.Entry<Character, Integer> m : toClone.variables.entrySet()){
-            this.variables.put(m.getKey(), m.getValue());
-        }
-        for(Map.Entry<String, Procedure> m : toClone.procedures.entrySet()){
-            this.procedureCopying.put(m.getKey(), m.getValue());
-        }
-        this.procedures = procedureCopying;
+        this.variables.putAll(toClone.variables);
+        this.procedures.putAll(toClone.procedures);
     }
 
     @Override
@@ -64,9 +58,6 @@ public class Block extends Instructions {
     @Override
     public void end(List<Instructions> scopeStack){
         scopeStack.remove(this);
-        for(String s : procedureCopying.keySet()){
-            procedures.put(s, procedureCopying.get(s));
-        }
     }
 
     @Override
