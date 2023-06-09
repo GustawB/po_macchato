@@ -11,15 +11,16 @@ import java.util.Map;
 public class Procedure extends Block{
     private String procedureName;
     private List<Character> paramNames;
-    private List<Expressions> paramExpressions;
+    private List<Expressions> paramExpressions = new ArrayList<>();
     //Constructor used for creating a new procedure object so that
     //a new procedure can be declared
 
-    private Procedure(declarationBuilder pr){
+    private Procedure(declarationBuilder db){
         super(); //for my visibility
-        this.procedureName = pr.name;
+        this.procedureName = db.name;
         paramNames = new ArrayList<>();
-        paramNames.addAll(pr.variableNames);
+        paramNames.addAll(db.variableNames);
+        instructions.addAll(db.instructions);
     }
 
     private Procedure(invokeBuilder ib){
@@ -28,12 +29,18 @@ public class Procedure extends Block{
         this.paramExpressions.addAll(ib.parameters);
     }
 
-    //Constructor used for using the same function declaration multiple times
-    public Procedure(Procedure procedure){
-        this.procedureName = procedure.getProcedureName();
-        paramNames = new ArrayList<>(procedure.getParamNames());
-        paramExpressions = new ArrayList<>();
-        instructions = new ArrayList<>(procedure.getInstructions());
+    private Procedure(Procedure toClone){
+        super();
+        this.paramExpressions.addAll(toClone.paramExpressions);
+        this.procedureName = toClone.getProcedureName();
+        for(Instructions ins : toClone.instructions){
+            this.instructions.add(ins.clone());
+        }
+    }
+
+    @Override
+    public Procedure clone(){
+        return new Procedure(this);
     }
 
     public List<Character> getParamNames(){
@@ -52,10 +59,34 @@ public class Procedure extends Block{
 
     @Override
     public void execute(List<Instructions> scopeStack) {
-        for(int i = 0; i < paramNames.size(); ++i) {
-            variableCopying.put(paramNames.get(i), paramExpressions.get(i).value(scopeStack));
+        for(int i = scopeStack.size() - 1; i >= 0 ; --i) {
+            if (scopeStack.get(i).getProcedures().containsKey(procedureName)) {
+                Procedure p = scopeStack.get(i).getProcedures().get(procedureName);
+                if (this.paramExpressions.size() != p.getParamNames().size()) {
+                    System.out.println("Error in: Procedure named "
+                            + procedureName + "; ");
+                    printVariablesInScope(scopeStack);
+                    return;
+                }
+                try {
+                    for (int y = 0; y < this.paramExpressions.size(); ++y) {
+                        char key = p.paramNames.get(y);
+                        int value = paramExpressions.get(y).value(scopeStack);
+                        this.variables.put(key, value);
+                    }
+                }
+                catch (Exception e){
+                    System.out.println("Error in: Procedure named "
+                            + procedureName + "; ");
+                    printVariablesInScope(scopeStack);
+                    return;
+                }
+                for(Instructions ins : p.instructions){
+                    this.instructions.add(ins.clone());
+                }
+                break;
+            }
         }
-        variables = variableCopying;
         scopeStack.add(this);
     }
 
@@ -124,6 +155,10 @@ public class Procedure extends Block{
             instructions.add(condition);
             return this;
         }
+
+        public Procedure build(){
+            return new Procedure(this);
+        }
     }
 
     public static class invokeBuilder {
@@ -135,6 +170,10 @@ public class Procedure extends Block{
             for(Expressions e : params){
                 this.parameters.add(e);
             }
+        }
+
+        public Procedure build(){
+            return new Procedure(this);
         }
     }
 }
