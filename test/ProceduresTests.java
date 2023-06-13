@@ -66,11 +66,38 @@ public class ProceduresTests {
                 .invoke(new Procedure.invokeBuilder("zegz", Literal.of(0))
                         .build())
                 .build();
-
         Debugger debugger = new Debugger();
         debugger.run(program, 'n');
 
         assertEquals("0123456", outputStreamCaptor
+                .toString().trim().replace("\n", "")
+                .replace("\r", ""));
+    }
+
+    //Code based on the example provided in the design specification.
+    @Test
+    public void designSpecCode(){
+        Block program = new Block.Builder()
+                .declareVariable('x', Literal.of(101))
+                .declareVariable('y', Literal.of(1))
+                .declareProcedure(new Procedure.declarationBuilder("out", 'a')
+                        .print(Add.of(Variable.of('a'), Variable.of('x')))
+                        .build())
+                .assign('x', Substract.of(Variable.of('x'), Variable.of('y')))
+                .invoke(new Procedure.invokeBuilder("out", Variable.of('x'))
+                        .build())
+                .invoke(new Procedure.invokeBuilder("out", Literal.of(100))
+                        .build())
+                .newBlock(new Block.Builder()
+                        .declareVariable('x', Literal.of(10))
+                        .invoke(new Procedure.invokeBuilder("out", Literal.of(100))
+                                .build())
+                        .build())
+                .build();
+        Debugger debugger = new Debugger();
+        debugger.run(program, 'n');
+
+        assertEquals("200200110", outputStreamCaptor
                 .toString().trim().replace("\n", "")
                 .replace("\r", ""));
     }

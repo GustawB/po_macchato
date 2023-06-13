@@ -91,6 +91,26 @@ public class BuildersTests {
                 .toString().trim().replace("\n", "")
                 .replace("\r", ""));
     }
+
+    //One big test to test builder functionality in the remaining Expressions classes.
+    @Test
+    public void ExpressionsTest(){
+        Block program = new Block.Builder()
+                .declareVariable('z', Literal.of(2137))
+                .assign('z', Add.of(Variable.of('z'), Literal.of(420)))
+                .assign('z', Substract.of(Variable.of('z'), Literal.of(69)))
+                .assign('z', Modulo.of(Variable.of('z'), Literal.of(45)))
+                .assign('z', Multiply.of(Variable.of('z'), Literal.of(29)))
+                .print(Variable.of('z'))
+                .build();
+        Debugger debugger = new Debugger();
+        debugger.run(program, 'n');
+
+        assertEquals("377", outputStreamCaptor
+                .toString().trim().replace("\n", "")
+                .replace("\r", ""));
+    }
+
     @AfterEach
     public void tearDown() {
         System.setOut(standardOut);

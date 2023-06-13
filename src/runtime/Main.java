@@ -10,19 +10,24 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
         Block program = new Block.Builder()
-                .declareProcedure(new Procedure.declarationBuilder("zegz", 'x')
-                        .condition(new IfStatement.Builder(Variable.of('x'), Literal.of(6), Operations.SMALLER_EQUAL)
-                                .print(Variable.of('x'))
-                                .assign('x', Add.of(Variable.of('x'), Literal.of(1)))
-                                .invoke(new Procedure.invokeBuilder("zegz", Variable.of('x'))
-                                        .build())
-                                .build())
+                .declareVariable('x', Literal.of(101))
+                .declareVariable('y', Literal.of(1))
+                .declareProcedure(new Procedure.declarationBuilder("out", 'a')
+                        .print(Add.of(Variable.of('a'), Variable.of('x')))
                         .build())
-                .invoke(new Procedure.invokeBuilder("zegz", Literal.of(0))
+                .assign('x', Substract.of(Variable.of('x'), Variable.of('y')))
+                .invoke(new Procedure.invokeBuilder("out", Variable.of('x'))
+                        .build())
+                .invoke(new Procedure.invokeBuilder("out", Literal.of(100))
+                        .build())
+                .newBlock(new Block.Builder()
+                        .declareVariable('x', Literal.of(10))
+                        .invoke(new Procedure.invokeBuilder("out", Literal.of(100))
+                                .build())
                         .build())
                 .build();
 
         Debugger debugger = new Debugger();
-        debugger.run(program, 'n');
+        debugger.run(program);
     }
 }
