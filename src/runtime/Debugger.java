@@ -29,6 +29,12 @@ public class Debugger {
     private int numberOfSteps;
     //keeps the information how many steps we have already performed
     private int stepsIter;
+
+    private String testFilePath = "";
+
+    private boolean bShouldDump = false;
+    private Debugger debugger;
+
     //Function responsible for determining whether we run
     // with or without the debug mode
     private void chooseMode(){
@@ -127,7 +133,7 @@ public class Debugger {
         List<String> textToWrite = new ArrayList<>();
         if(scopeStack.size() > 0) {
             for (int i = scopeStack.size() - 1;
-                 i >= scopeStack.size() - 1; --i) {
+                 i >= 0; --i) {
                 Instructions instructions = scopeStack.get(i);
                 for (Map.Entry<Character, Integer> m :
                         instructions.getVariables().entrySet()) {
@@ -167,6 +173,21 @@ public class Debugger {
                 if ((debugMode.equals("s") && stepsIter == numberOfSteps) ||
                         debugMode.isEmpty()) {
                     do {
+                        if(bShouldDump){
+                            String filePath = "";
+                            boolean bIsValidCommand = true;
+                            try {
+                                filePath = testFilePath;
+                            }
+                            catch (Exception e){
+                                bIsValidCommand = false;
+                            }
+                            if(bIsValidCommand) {
+                                dump(filePath);
+                            }
+                            debugMode = "e";
+                            break;
+                        }
                         //if we stopped stepping, we display the
                         //next instruction
                         if (debugMode.equals("s")) {
@@ -280,6 +301,19 @@ public class Debugger {
         mode = runMode;
         numberOfSteps = 0;
         stepsIter = 0;
+        List<Instructions> instructions = new ArrayList<>();
+        instructions.add(Program);
+        iterateThroughInstructions(instructions);
+    }
+
+    //run() overload used in testing dumper functionality.
+    public void run(Block Program, String filePath, int stepsBeforeDump){
+        mode = 'y';
+        debugMode = "s";
+        numberOfSteps = stepsBeforeDump;
+        stepsIter = 0;
+        testFilePath = filePath;
+        bShouldDump = true;
         List<Instructions> instructions = new ArrayList<>();
         instructions.add(Program);
         iterateThroughInstructions(instructions);
