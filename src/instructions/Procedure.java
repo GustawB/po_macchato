@@ -73,13 +73,23 @@ public class Procedure extends Block{
         if(bWasThereVariableRedeclaration){
             if(bWasThereProcedureRedeclaration &&
                     !bWasVariableRedeclarationFirst) {
+                System.out.println("Error in: Procedure named "
+                        + procedureName + "; ");
+                printVariablesInScope(scopeStack);
+                printVariablesInScope(scopeStack);
                 throw new NonExistingProcedureException();
             }
             else{
+                System.out.println("Error in: Procedure named "
+                        + procedureName + "; ");
+                printVariablesInScope(scopeStack);
                 throw new NonExistingVariableException();
             }
         }
         else if(bWasThereProcedureRedeclaration){
+            System.out.println("Error in: Procedure named "
+                    + procedureName + "; ");
+            printVariablesInScope(scopeStack);
             throw new NonExistingProcedureException();
         }
 

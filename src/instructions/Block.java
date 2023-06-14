@@ -71,13 +71,19 @@ public class Block extends Instructions {
     public void execute(List<Instructions> scopeStack) {
         if(bWasThereVariableRedeclaration){
             if(bWasThereProcedureRedeclaration && !bWasVariableRedeclarationFirst) {
+                System.out.println("Error in: Block;");
+                printVariablesInScope(scopeStack);
                 throw new NonExistingProcedureException();
             }
             else{
+                System.out.println("Error in: Block;");
+                printVariablesInScope(scopeStack);
                 throw new NonExistingVariableException();
             }
         }
         else if(bWasThereProcedureRedeclaration){
+            System.out.println("Error in: Block;");
+            printVariablesInScope(scopeStack);
             throw new NonExistingProcedureException();
         }
 
