@@ -17,6 +17,7 @@ public class IfStatement extends Instructions {
     protected List<Instructions> ifInstructions;
     protected List<Instructions> elseInstructions;
 
+    //Constructor used by the builder.
     private IfStatement(Builder cb){
         ifInstructions = new ArrayList<>();
         elseInstructions = new ArrayList<>();
@@ -27,7 +28,7 @@ public class IfStatement extends Instructions {
         operation = cb.operator;
     }
 
-    //used for cloning
+    //Used in clone() function.
     private IfStatement(IfStatement toClone){
         ifInstructions = new ArrayList<>();
         elseInstructions = new ArrayList<>();
@@ -144,6 +145,9 @@ public class IfStatement extends Instructions {
         return sb.toString();
     }
 
+    //Builder for the IfStatement class. Its values are updated by calling the
+    //respective functions. Then, by calling the build() function we
+    //create a new object of the IfStatement class by using the special constructor.
     public static class Builder {
         private List<Instructions> ifInstructions = new ArrayList<>();
         private List<Instructions> elseInstructions = new ArrayList<>();

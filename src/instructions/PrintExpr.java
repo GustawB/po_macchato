@@ -6,11 +6,12 @@ import java.util.List;
 
 public class PrintExpr extends Instructions {
     protected Expressions expr;
-    public PrintExpr(Expressions expr) {
+    protected PrintExpr(Expressions expr) {
         super();
         this.expr = expr;
     }
 
+    //Constructor used in the clone() function.
     private PrintExpr(PrintExpr toClone){
         this.expr = toClone.expr;
     }
@@ -27,7 +28,7 @@ public class PrintExpr extends Instructions {
             value = expr.value(scopeStack);
         }
         catch (Exception e){
-            System.out.println("Error in: instructions.PrintExpr(" + expr + ")");
+            System.out.println("Error in: PrintExpr(" + expr + ")");
             printVariablesInScope(scopeStack);
             throw e;
         }

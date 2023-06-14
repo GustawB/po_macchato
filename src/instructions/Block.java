@@ -19,7 +19,7 @@ public class Block extends Instructions {
     protected boolean bWasThereProcedureRedeclaration = false;
     protected boolean bWasVariableRedeclarationFirst = false;
 
-    //Constructor used by builder
+    //Constructor used by the builder.
     private Block(Builder bb){
         this.bWasThereProcedureRedeclaration = bb.bWasThereProcedureRedeclaration;
         this.bWasThereVariableRedeclaration = bb.bWasThereVariableRedeclaration;
@@ -88,7 +88,7 @@ public class Block extends Instructions {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         appendTabs(sb);
-        sb.append("begin instructions.Block\n");
+        sb.append("begin Block\n");
         for(Instructions ins : instructions){
             for(int i = 0; i <= numberOfTabs; ++i) {
                 ins.incrementNumberOfTabs();
@@ -99,12 +99,14 @@ public class Block extends Instructions {
             }
         }
         appendTabs(sb);
-        sb.append("end instructions.Block\n");
+        sb.append("end Block\n");
 
         return sb.toString();
     }
 
-
+    //Builder for the Block class. Its values are updated by calling the
+    //respective functions. Then, by calling the build() function we
+    //create a new object of the Block class by using the special constructor.
     public static class Builder {
         private final Map<Character, Integer> variables = new HashMap<>();
         private final Map<String, Procedure> procedures  = new HashMap<>();

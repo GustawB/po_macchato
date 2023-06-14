@@ -30,10 +30,11 @@ public class Debugger {
     //keeps the information how many steps we have already performed
     private int stepsIter;
 
+    //Filepath for testing dump functionality.
     private String testFilePath = "";
 
+    //Used by the overloaded run() in tests fo the dump functionality.
     private boolean bShouldDump = false;
-    private Debugger debugger;
 
     //Function responsible for determining whether we run
     // with or without the debug mode
@@ -122,6 +123,7 @@ public class Debugger {
         }
     }
 
+    //Function used to write a current valuation into the specified file.
     protected void dump(String filePath){
         Path file = null;
         try {
@@ -163,7 +165,7 @@ public class Debugger {
         }
     }
 
-    //runtime.Main logic of the debugger. THis function iterates through instructions,
+    //Main logic of the debugger. THis function iterates through instructions,
     //and if they have nested instructions, it recursively iterates
     //through them too
     protected void iterateThroughInstructions(List<Instructions> instructions){

@@ -29,7 +29,7 @@ public class ProceduresTests {
     }
 
     //This test tests the basic procedure functionality by
-    //implementing the example given in the instruction
+    //implementing the example given in the instruction.
     @Test
     public void BasicUsage(){
         Block program = new Block.Builder()
@@ -52,6 +52,7 @@ public class ProceduresTests {
                 .replace("\r", ""));
     }
 
+    //Testing recursion on procedures.
     @Test
     public void recursion(){
         Block program = new Block.Builder()
@@ -74,7 +75,7 @@ public class ProceduresTests {
                 .replace("\r", ""));
     }
 
-    //Code based on the example provided in the design specification.
+    //Code based on the new example provided in the design specification.
     @Test
     public void designSpecCode(){
         Block program = new Block.Builder()

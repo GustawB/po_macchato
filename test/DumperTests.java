@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DumperTests {
     private String filePath = "ugabuga.txt";
 
+    //Tests dump() function on one scope.
     @Test
     public void OneScopeDumper(){
         Block program = new Block.Builder()
@@ -69,6 +70,7 @@ public class DumperTests {
         assertTrue(test.delete());
     }
 
+    //Tests dump() function on multiple scopes.
     @Test
     public void TwoScopes(){
         Block program = new Block.Builder()

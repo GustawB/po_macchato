@@ -16,6 +16,7 @@ public class Procedure extends Block{
     //Constructor used for creating a new procedure object so that
     //a new procedure can be declared
 
+    //Constructor used by the declarationBuilder.
     private Procedure(declarationBuilder db){
         super(); //for my visibility
         this.bWasThereProcedureRedeclaration = db.bWasThereProcedureRedeclaration;
@@ -29,12 +30,14 @@ public class Procedure extends Block{
         procedures.putAll(db.procedures);
     }
 
+    //Constructor used by the invokeBuilder.
     private Procedure(invokeBuilder ib){
         super();
         this.procedureName = ib.name;
         this.paramExpressions.addAll(ib.parameters);
     }
 
+    //Constructor used by the clone() function.
     private Procedure(Procedure toClone){
         super();
         variables.putAll(toClone.variables);
@@ -66,8 +69,10 @@ public class Procedure extends Block{
 
     @Override
     public void execute(List<Instructions> scopeStack) {
+        //Handling of the NonExisting and ProcedureRedeclaration exceptions.
         if(bWasThereVariableRedeclaration){
-            if(bWasThereProcedureRedeclaration && !bWasVariableRedeclarationFirst) {
+            if(bWasThereProcedureRedeclaration &&
+                    !bWasVariableRedeclarationFirst) {
                 throw new NonExistingProcedureException();
             }
             else{
@@ -79,15 +84,22 @@ public class Procedure extends Block{
         }
 
         boolean bWasProcedureDeclared = false;
+        //Loop responsible for checking whether the procedure with the given
+        //name was declared, and if so, "creating" it based on the declaration,
+        //and then adding it to the scope.
         for(int i = scopeStack.size() - 1; i >= 0 ; --i) {
             if (scopeStack.get(i).getProcedures().containsKey(procedureName)) {
-                Procedure p = scopeStack.get(i).getProcedures().get(procedureName);
+                Procedure p = scopeStack.get(i).
+                        getProcedures().get(procedureName);
+                //Invalid number of params.
                 if (this.paramExpressions.size() != p.getParamNames().size()) {
                     System.out.println("Error in: Procedure named "
                             + procedureName + "; ");
                     printVariablesInScope(scopeStack);
                     throw new InvalidNumberOfProcedureParametersException();
                 }
+                //Make Map of variables based on the names of the parameters
+                //and its values.
                 try {
                     for (int y = 0; y < this.paramExpressions.size(); ++y) {
                         char key = p.paramNames.get(y);
@@ -101,6 +113,8 @@ public class Procedure extends Block{
                     printVariablesInScope(scopeStack);
                     throw e;
                 }
+                //Copy instructions from the declaration. Clone function
+                //prevents shallow copy here.
                 for(Instructions ins : p.instructions){
                     this.instructions.add(ins.clone());
                 }
@@ -108,6 +122,7 @@ public class Procedure extends Block{
                 break;
             }
         }
+        //Procedure with the given name wasn't declared before.
         if(!bWasProcedureDeclared){
             System.out.println("Error in: Procedure named "
                     + procedureName + "; ");
@@ -151,6 +166,14 @@ public class Procedure extends Block{
         return sb.toString();
     }
 
+    //Two builders for the procedure class. declarationBuilder is used to
+    //declare a new procedure, by defining its name, parameters, instructions
+    //and varables inside its body. Then, the invokeBuilder is used to
+    //call the declared procedure, by creating an object of the class
+    //Procedure with the name, and a list of parameters. Then,
+    //this newly added procedure is added to the list of instructions,
+    //and when its executed, it's missing fields (e.g. variable's map)
+    //are filled based on its declaration (made with declarationBuilder).
     public static class declarationBuilder {
         private final List<Instructions> instructions = new ArrayList<>();
         private final List<Character> variableNames = new ArrayList<>();

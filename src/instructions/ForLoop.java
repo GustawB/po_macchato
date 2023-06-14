@@ -19,6 +19,8 @@ public class ForLoop extends Block{
     private boolean isStarted;
     private boolean bAreThereAnyIterationsToPerform = true;
 
+
+    //Constructor used by the builder.
     private ForLoop(Builder lb){
         super(); //for my visibility
         this.iteratorName = lb.iteratorName;
@@ -27,6 +29,7 @@ public class ForLoop extends Block{
         isStarted = false;
     }
 
+    //Constructor used in the clone() function.
     private ForLoop(ForLoop toClone){
         super();
         iterExpr = toClone.iterExpr;
@@ -74,7 +77,7 @@ public class ForLoop extends Block{
                 iterValueStateAtTheEnd = iterExpr.value(scopeStack);
             }
             catch(Exception e){//calculating the value of the expression failed
-                System.out.println("Error in: instructions.ForLoop(" + iteratorName +
+                System.out.println("Error in: ForLoop(" + iteratorName +
                         "; " + iterExpr + ")");
                 printVariablesInScope(scopeStack);
                 throw e;
@@ -109,6 +112,9 @@ public class ForLoop extends Block{
         return sb.toString();
     }
 
+    //Builder for the ForLoop class. Its values are updated by calling the
+    //respective functions. Then, by calling the build() function we
+    //create a new object of the ForLoop class by using the special constructor.
     public static class Builder {
         private char iteratorName;
         private Expressions limit;

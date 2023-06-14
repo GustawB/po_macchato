@@ -22,6 +22,7 @@ public class Multiply extends Expressions {
         return (left.toString() + " * " + right.toString());
     }
 
+    //Used in the Builder Design pattern in the form of Expressions.of().
     public static Multiply of(Expressions left, Expressions right){
         return new Multiply(left, right);
     }
