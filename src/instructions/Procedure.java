@@ -1,12 +1,13 @@
 package instructions;
 
+import exceptions.InvalidNumberOfProcedureParametersException;
+import exceptions.NonExistentProcedureException;
+import exceptions.NonExistingProcedureException;
+import exceptions.NonExistingVariableException;
 import expressions.Expressions;
 import expressions.Literal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Procedure extends Block{
     private String procedureName;
@@ -17,10 +18,15 @@ public class Procedure extends Block{
 
     private Procedure(declarationBuilder db){
         super(); //for my visibility
+        this.bWasThereProcedureRedeclaration = db.bWasThereProcedureRedeclaration;
+        this.bWasThereVariableRedeclaration = db.bWasThereVariableRedeclaration;
+        this.bWasVariableRedeclarationFirst = db.bWasVariableRedeclarationFirst;
         this.procedureName = db.name;
+        variables.putAll(db.variables);
         paramNames = new ArrayList<>();
         paramNames.addAll(db.variableNames);
         instructions.addAll(db.instructions);
+        procedures.putAll(db.procedures);
     }
 
     private Procedure(invokeBuilder ib){
@@ -31,6 +37,7 @@ public class Procedure extends Block{
 
     private Procedure(Procedure toClone){
         super();
+        variables.putAll(toClone.variables);
         this.paramExpressions.addAll(toClone.paramExpressions);
         this.procedureName = toClone.getProcedureName();
         for(Instructions ins : toClone.instructions){
@@ -59,6 +66,19 @@ public class Procedure extends Block{
 
     @Override
     public void execute(List<Instructions> scopeStack) {
+        if(bWasThereVariableRedeclaration){
+            if(bWasThereProcedureRedeclaration && !bWasVariableRedeclarationFirst) {
+                throw new NonExistingProcedureException();
+            }
+            else{
+                throw new NonExistingVariableException();
+            }
+        }
+        else if(bWasThereProcedureRedeclaration){
+            throw new NonExistingProcedureException();
+        }
+
+        boolean bWasProcedureDeclared = false;
         for(int i = scopeStack.size() - 1; i >= 0 ; --i) {
             if (scopeStack.get(i).getProcedures().containsKey(procedureName)) {
                 Procedure p = scopeStack.get(i).getProcedures().get(procedureName);
@@ -66,7 +86,7 @@ public class Procedure extends Block{
                     System.out.println("Error in: Procedure named "
                             + procedureName + "; ");
                     printVariablesInScope(scopeStack);
-                    return;
+                    throw new InvalidNumberOfProcedureParametersException();
                 }
                 try {
                     for (int y = 0; y < this.paramExpressions.size(); ++y) {
@@ -79,13 +99,20 @@ public class Procedure extends Block{
                     System.out.println("Error in: Procedure named "
                             + procedureName + "; ");
                     printVariablesInScope(scopeStack);
-                    return;
+                    throw e;
                 }
                 for(Instructions ins : p.instructions){
                     this.instructions.add(ins.clone());
                 }
+                bWasProcedureDeclared = true;
                 break;
             }
+        }
+        if(!bWasProcedureDeclared){
+            System.out.println("Error in: Procedure named "
+                    + procedureName + "; ");
+            printVariablesInScope(scopeStack);
+            throw new NonExistentProcedureException();
         }
         scopeStack.add(this);
     }
@@ -127,6 +154,12 @@ public class Procedure extends Block{
     public static class declarationBuilder {
         private final List<Instructions> instructions = new ArrayList<>();
         private final List<Character> variableNames = new ArrayList<>();
+        private final Map<Character, Integer> variables = new HashMap<>();
+        private final Map<String, Procedure> procedures  = new HashMap<>();
+        boolean bWasThereVariableRedeclaration = false;
+        boolean bWasThereProcedureRedeclaration = false;
+        boolean bWasVariableRedeclarationFirst = false;
+
         private String name;
 
         public declarationBuilder (String name, char... variableNames){
@@ -134,6 +167,28 @@ public class Procedure extends Block{
             for(char c : variableNames){
                 this.variableNames.add(c);
             }
+        }
+
+        public declarationBuilder declareVariable(char name, Literal value){
+            if(variables.containsKey(name)){
+                if(!bWasThereProcedureRedeclaration && bWasThereVariableRedeclaration){
+                    bWasVariableRedeclarationFirst = true;
+                }
+                bWasThereVariableRedeclaration = true;
+            }
+            else {
+                variables.put(name, value.value());
+            }
+            return this;
+        }
+        public declarationBuilder declareProcedure(Procedure procedure){
+            if(procedures.containsKey(procedure.getProcedureName())){
+                bWasThereProcedureRedeclaration = true;
+            }
+            else {
+                procedures.put(procedure.getProcedureName(), procedure);
+            }
+            return this;
         }
 
         public declarationBuilder assign(char assignTo, Expressions valueToAssign){
@@ -167,9 +222,7 @@ public class Procedure extends Block{
 
         public invokeBuilder (String name, Expressions... params){
             this.name = name;
-            for(Expressions e : params){
-                this.parameters.add(e);
-            }
+            this.parameters.addAll(Arrays.asList(params));
         }
 
         public Procedure build(){
