@@ -13,12 +13,13 @@ public class AssignValue extends Instructions {
     private int newValue;
     //name of the variable that we want to change
     private char name;
-    public AssignValue(char name, Expressions expression){
+    protected AssignValue(char name, Expressions expression){
         super();
         valueExpr = expression;
         this.name = name;
     }
 
+    //Constructor used in clone() function.
     private AssignValue(AssignValue toClone){
         super();
         this.name = toClone.name;

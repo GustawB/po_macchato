@@ -22,6 +22,7 @@ public class Add extends Expressions {
         return (left.toString() + " + " + right.toString());
     }
 
+    //Used in the Builder Design pattern in the form of Expressions.of().
     public static Add of(Expressions left, Expressions right){
         return new Add(left, right);
     }

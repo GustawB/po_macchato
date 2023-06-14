@@ -17,6 +17,7 @@ public class Literal extends Expressions {
 
     public int value(){return value;}
 
+    //Used in the Builder Design pattern in the form of Expressions.of().
     public static Literal of(int value){
         return new Literal(value);
     }

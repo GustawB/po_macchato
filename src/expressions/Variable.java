@@ -26,6 +26,7 @@ public class Variable extends Expressions {
         return name + "";
     }
 
+    //Used in the Builder Design pattern in the form of Expressions.of().
     public static Variable of(char name){
         return new Variable(name);
     }

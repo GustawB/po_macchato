@@ -26,6 +26,7 @@ public abstract class Instructions {
     //function responsible for the execution of the instruction
     public abstract void execute(List<Instructions> scopeStack);
 
+    //Clone function used to prevent shallow copy on instructions.
     public abstract Instructions clone();
 
     //function called at the end of the instruction execution
@@ -40,7 +41,7 @@ public abstract class Instructions {
     public Map<String, Procedure> getProcedures(){return procedures;}
 
     //function used for printing tabs when the debugger
-    //prints nested instructions
+    //prints nested instructions.
     protected void appendTabs(StringBuilder sb){
         for(int i = 0; i < numberOfTabs; ++i){
             sb.append("    ");

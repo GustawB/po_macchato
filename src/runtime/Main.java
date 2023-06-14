@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
+
+    //Example program from the instruction.
     public static void main(String[] args) {
         Block program = new Block.Builder()
                 .declareVariable('x', Literal.of(101))

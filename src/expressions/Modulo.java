@@ -22,6 +22,7 @@ public class Modulo extends Expressions {
         return (left.toString() + " % " + right.toString());
     }
 
+    //Used in the Builder Design pattern in the form of Expressions.of().
     public static Modulo of(Expressions left, Expressions right){
         return new Modulo(left, right);
     }

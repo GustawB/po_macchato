@@ -30,7 +30,8 @@ public class BuildersTests {
     }
 
 
-    //Tests basic functionality of builders in Block
+    //Tests basic functionality of builders in Block and PrintExpr class
+    //(Used as Builder().print)
     @Test
     public void TestBlockPrints(){
         Block program = new Block.Builder()
@@ -50,7 +51,7 @@ public class BuildersTests {
                 .replace("\r", ""));
     }
 
-    //Tests builder functionality on Loops
+    //Tests builder functionality on Loops.
     @Test
     public void TestLoopPrints(){
         Block program = new Block.Builder()
@@ -68,7 +69,7 @@ public class BuildersTests {
                 .replace("\r", ""));
     }
 
-    //Tests builder functionality on IfStatements
+    //Tests builder functionality on IfStatements.
     @Test
     public void TestIfStatements(){
         Block program = new Block.Builder()
@@ -107,6 +108,22 @@ public class BuildersTests {
         debugger.run(program, 'n');
 
         assertEquals("377", outputStreamCaptor
+                .toString().trim().replace("\n", "")
+                .replace("\r", ""));
+    }
+
+
+    //Test to check the functionality of the AssignValue class (used as Builder().assign).
+    @Test public void assignTest(){
+        Block program = new Block.Builder()
+                .declareVariable('z', Literal.of(2137))
+                .assign('z', Add.of(Variable.of('z'), Literal.of(69)))
+                .print(Variable.of('z'))
+                .build();
+        Debugger debugger = new Debugger();
+        debugger.run(program, 'n');
+
+        assertEquals("2206", outputStreamCaptor
                 .toString().trim().replace("\n", "")
                 .replace("\r", ""));
     }
