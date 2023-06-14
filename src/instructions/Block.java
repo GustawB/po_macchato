@@ -2,6 +2,7 @@ package instructions;
 
 import exceptions.InvalidNumberOfProcedureParametersException;
 import exceptions.NonExistingProcedureException;
+import exceptions.NonExistingVariableException;
 import expressions.Expressions;
 import expressions.Literal;
 
@@ -14,9 +15,15 @@ public class Block extends Instructions {
     //When we make the new object of the class block, we pass all the
     //variable declarations to the constructor, so we won't be able to
     //add new variables after the end of the declaration series
+    protected boolean bWasThereVariableRedeclaration = false;
+    protected boolean bWasThereProcedureRedeclaration = false;
+    protected boolean bWasVariableRedeclarationFirst = false;
 
     //Constructor used by builder
     private Block(Builder bb){
+        this.bWasThereProcedureRedeclaration = bb.bWasThereProcedureRedeclaration;
+        this.bWasThereVariableRedeclaration = bb.bWasThereVariableRedeclaration;
+        this.bWasVariableRedeclarationFirst = bb.bWasVariableRedeclarationFirst;
         this.variables = bb.variables;
         this.procedures = bb.procedures;
         //procedureCopying = new HashMap<>();
@@ -62,6 +69,18 @@ public class Block extends Instructions {
 
     @Override
     public void execute(List<Instructions> scopeStack) {
+        if(bWasThereVariableRedeclaration){
+            if(bWasThereProcedureRedeclaration && !bWasVariableRedeclarationFirst) {
+                throw new NonExistingProcedureException();
+            }
+            else{
+                throw new NonExistingVariableException();
+            }
+        }
+        else if(bWasThereProcedureRedeclaration){
+            throw new NonExistingProcedureException();
+        }
+
         scopeStack.add(this);
     }
 
@@ -90,13 +109,29 @@ public class Block extends Instructions {
         private final Map<Character, Integer> variables = new HashMap<>();
         private final Map<String, Procedure> procedures  = new HashMap<>();
         private final List<Instructions> instructions = new ArrayList<>();
+        boolean bWasThereVariableRedeclaration = false;
+        boolean bWasThereProcedureRedeclaration = false;
+        boolean bWasVariableRedeclarationFirst = false;
 
         public Builder declareVariable(char name, Literal value){
-            variables.put(name, value.value());
+            if(variables.containsKey(name)){
+                if(!bWasThereProcedureRedeclaration && bWasThereVariableRedeclaration){
+                    bWasVariableRedeclarationFirst = true;
+                }
+                bWasThereVariableRedeclaration = true;
+            }
+            else {
+                variables.put(name, value.value());
+            }
             return this;
         }
         public Builder declareProcedure(Procedure procedure){
-            procedures.put(procedure.getProcedureName(), procedure);
+            if(procedures.containsKey(procedure.getProcedureName())){
+                bWasThereProcedureRedeclaration = true;
+            }
+            else {
+                procedures.put(procedure.getProcedureName(), procedure);
+            }
             return this;
         }
 
